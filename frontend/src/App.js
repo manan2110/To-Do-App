@@ -1,6 +1,5 @@
 import './App.css';
-import React, { Component } from 'react';
-import jQuery from 'jquery';
+import React from 'react';
 
 class App extends React.Component {
   constructor(props) {
@@ -79,7 +78,7 @@ class App extends React.Component {
 
     var url = 'http://127.0.0.1:8000/api/task-create/'
 
-    if (this.state.editing == true) {
+    if (this.state.editing === true) {
       url = `http://127.0.0.1:8000/api/task-update/${this.state.activeItem.id}/`
       this.setState({
         editing: false
@@ -184,7 +183,7 @@ class App extends React.Component {
 
                   <div onClick={() => self.strikeUnstrike(task)} style={{ flex: 7 }}>
 
-                    {task.completed == false ? (
+                    {task.completed === false ? (
                       <span>{task.title}</span>
 
                     ) : (
