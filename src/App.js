@@ -1,5 +1,9 @@
 import './App.css';
 import React from 'react';
+import axios from 'axios';
+
+axios.defaults.xsrfCookieName = 'csrftoken'
+axios.defaults.xsrfHeaderName = 'X-CSRFToken'
 
 class App extends React.Component {
   constructor(props) {
@@ -45,15 +49,15 @@ class App extends React.Component {
   }
 
   fetchTasks() {
-    console.log('Fetching...')
+    console.log('Fetching...');
 
-    fetch('http://127.0.0.1:8000/api/task-list/')
-      .then(response => response.json())
+    axios.get("/api/task-list/")
       .then(data =>
         this.setState({
-          todoList: data
+          todoList: data.data
         })
       )
+      .catch(err => console.log(err));
   }
 
   handleChange(e) {
@@ -73,39 +77,28 @@ class App extends React.Component {
   handleSubmit(e) {
     e.preventDefault()
     console.log('ITEM:', this.state.activeItem)
-
-    var csrftoken = this.getCookie('csrftoken')
-
-    var url = 'http://127.0.0.1:8000/api/task-create/'
+    var url = '/api/task-create/'
 
     if (this.state.editing === true) {
-      url = `http://127.0.0.1:8000/api/task-update/${this.state.activeItem.id}/`
+      url = `/api/task-update/${this.state.activeItem.id}/`
       this.setState({
         editing: false
       })
     }
 
-
-
-    fetch(url, {
-      method: 'POST',
-      headers: {
-        'Content-type': 'application/json',
-        'X-CSRFToken': csrftoken,
-      },
-      body: JSON.stringify(this.state.activeItem)
-    }).then((response) => {
-      this.fetchTasks()
-      this.setState({
-        activeItem: {
-          id: null,
-          title: '',
-          completed: false,
-        }
+    axios.post(url, this.state.activeItem)
+      .then((response) => {
+        this.fetchTasks()
+        this.setState({
+          activeItem: {
+            id: null,
+            title: '',
+            completed: false,
+          }
+        })
+      }).catch(function (error) {
+        console.log('ERROR:', error)
       })
-    }).catch(function (error) {
-      console.log('ERROR:', error)
-    })
 
   }
 
@@ -118,45 +111,37 @@ class App extends React.Component {
 
 
   deleteItem(task) {
-    var csrftoken = this.getCookie('csrftoken')
-
-    fetch(`http://127.0.0.1:8000/api/task-delete/${task.id}/`, {
-      method: 'DELETE',
-      headers: {
-        'Content-type': 'application/json',
-        'X-CSRFToken': csrftoken,
-      },
-    }).then((response) => {
-
-      this.fetchTasks()
-    })
+    axios.delete(`/api/task-delete/${task.id}/`)
+      .then((response) => {
+        this.fetchTasks()
+      })
   }
 
 
   strikeUnstrike(task) {
-
-    task.completed = !task.completed
     var csrftoken = this.getCookie('csrftoken')
-    var url = `http://127.0.0.1:8000/api/task-update/${task.id}/`
-
-    fetch(url, {
-      method: 'POST',
+    task.completed = !task.completed
+    var url = `/api/task-update/${task.id}/`
+    axios({
+      method: "POST",
+      url: url,
+      data: this.state.activeItem,
       headers: {
         'Content-type': 'application/json',
         'X-CSRFToken': csrftoken,
       },
       body: JSON.stringify({ 'completed': task.completed, 'title': task.title })
-    }).then(() => {
-      this.fetchTasks()
     })
-
+      .then(() => {
+        this.fetchTasks()
+      })
     console.log('TASK:', task.completed)
   }
 
 
   render() {
-    var tasks = this.state.todoList
-    var self = this
+    var tasks = this.state.todoList;
+    var self = this;
     return (
       <div className="container">
 
