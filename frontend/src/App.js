@@ -194,11 +194,11 @@ class App extends React.Component {
                   </div>
 
                   <div style={{ flex: 1 }}>
-                    <button onClick={() => self.startEdit(task)} className="btn btn-sm btn-outline-info">Edit</button>
+                    <button onClick={() => self.startEdit(task)} className="btn">  <i className="edit alternate outline icon" style={{ color: "blue" }}></i></button>
                   </div>
 
                   <div style={{ flex: 1 }}>
-                    <button onClick={() => self.deleteItem(task)} className="btn btn-sm btn-outline-danger delete">X</button>
+                    <button onClick={() => self.deleteItem(task)} className="btn"> <i className="trash alternate outline icon" style={{ color: "red" }}></i></button>
                   </div>
 
                 </div>
